@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   try {
     const { fullName, email, fieldOfStudy } = await request.json();
 
-    // Only send confirmation email to user
+    // Send confirmation email to user
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: email,
@@ -24,6 +24,19 @@ export async function POST(request: Request) {
         <p>Thank you for joining our waitlist. We've noted your field of study as "${fieldOfStudy}".</p>
         <p>We'll keep you updated on our launch and early access opportunities, especially regarding features relevant to ${fieldOfStudy} students.</p>
         <p>Best regards,<br>Student AI Helper Team</p>
+      `,
+    });
+
+    // Send notification email to admin
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: process.env.GMAIL_USER,
+      subject: 'New Waitlist Submission',
+      html: `
+        <h2>New Waitlist Submission</h2>
+        <p><strong>Name:</strong> ${fullName}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Field of Study:</strong> ${fieldOfStudy}</p>
       `,
     });
 
